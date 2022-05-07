@@ -1,0 +1,58 @@
+?start: block
+block: statement+
+?statement: assignment 
+        | "si" expression "alors" block elseif optional_else "fin" -> if_statement
+        | "tantque" expression "fait" block "fin" -> while_statement
+        | "répète" block "jusqu à" expression -> repeat_statement
+        | "fait" block "fin" -> do_statement
+        | "arrêt" -> break_statement
+        
+assignment: var "=" expression
+range: expression "," expression ["," expression]
+var: (NAME ",")* NAME
+elseif: ("sinon si" expression "alors" block)*
+optional_else: ["sinon" block]
+?expression: var
+        | literal
+        | expression ">" expression -> greater_than
+        | expression "<" expression -> less_than
+        | expression ">=" expression -> greater_equal
+        | expression "<=" expression -> less_equal
+        | expression "==" expression -> equal
+        | expression "~=" expression -> not_equal
+        | expression "ou" expression -> or
+        | expression "et" expression -> and
+        | expression "|" expression -> or_symbol
+        | expression "&" expression -> and_symbol
+        | expression "<<" expression -> lshift
+        | expression ">>" expression -> rshift
+        | expression ".." expression -> str_concat
+        | expression "+" expression -> add
+        | expression "-" expression -> sub
+        | expression "*" expression -> mult
+        | expression "/" expression -> div
+        | expression "//" expression -> int_div
+        | expression "%" expression -> mod
+        | expression "^" expression -> exp
+        | "pas" expression -> not
+        | "-" expression -> negation
+        | "#" expression -> hashtag
+        | "(" expression_list ")" -> function_args
+        | expression ":" NAME
+        | expression "[" expression "]"
+        | expression "." NAME
+?expression_list: (NAME ",")* NAME
+literal: NUMBER | STRING
+
+NUMBER: INTEGER | DECIMAL_NUMBER | HEXADECIMAL_NUMBER | BINARY_NUMBER | OCTAL_NUMBER | FLOAT_NUMBER
+STRING : /[ubf]?r?("(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?')/i
+NAME: /[a-zØ-öø-ÿA-Z]\w*/
+INTEGER: /[0-9]+/
+DECIMAL_NUMBER.2: INTEGER? "." INTEGER
+HEXADECIMAL_NUMBER.2: /0x[\da-f]*/i
+OCTAL_NUMBER.2: /0o[0-7]*/i
+BINARY_NUMBER.2 : /0b[0-1]*/i
+FLOAT_NUMBER.2: /((\d+\.\d*|\.\d+)(e[-+]?\d+)?|\d+(e[-+]?\d+))/i
+
+%import common.WS
+%ignore WS

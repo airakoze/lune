@@ -1,0 +1,9 @@
+arlène = "as"
+andy = 2
+si arlène == andy
+alors
+  arlène = 1
+  répète
+     arlène = arlène + 2
+  jusqu à arlène > 10
+fin
