@@ -31,8 +31,8 @@ Here's below a translation for all keywords:
 * return => retourne
 * then => alors
 * true => vrai
-* until => jusquà
-* while => tantque
+* until => jusqu à
+* while => tant que
 
 ### Lua Documentation
 
@@ -50,5 +50,5 @@ brew install lua
 
 To run an example,
 ```
-python lune.py calculator.lune
+python lune.py test.lune
 ```

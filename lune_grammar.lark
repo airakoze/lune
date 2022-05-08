@@ -1,17 +1,24 @@
 ?start: block
 block: statement+
 ?statement: assignment 
+        | "locale" assignment -> local_variable
         | "si" expression "alors" block elseif optional_else "fin" -> if_statement
-        | "tantque" expression "fait" block "fin" -> while_statement
+        | "tant que" expression "fait" block "fin" -> while_statement
         | "répète" block "jusqu à" expression -> repeat_statement
         | "fait" block "fin" -> do_statement
         | "arrêt" -> break_statement
-        
+        | "pour" NAME "=" range "fait" block "fin" -> for_statement
+        | "locale" "fonction" [NAME] "(" [var] ")" block "fin" -> local_function
+        | "fonction" [NAME] "(" [var] ")" block "fin" -> function
+        | "retourne" expression -> return
+        | var "=" table_constructor -> table
+        | NAME "(" [var] ")" -> function_call
 assignment: var "=" expression
-range: expression "," expression ["," expression]
+range: INTEGER "," INTEGER ["," INTEGER | ", -" NUMBER]
 var: (NAME ",")* NAME
 elseif: ("sinon si" expression "alors" block)*
 optional_else: ["sinon" block]
+table_constructor : "{" [expression] "}"
 ?expression: var
         | literal
         | expression ">" expression -> greater_than
@@ -35,14 +42,14 @@ optional_else: ["sinon" block]
         | expression "%" expression -> mod
         | expression "^" expression -> exp
         | "pas" expression -> not
-        | "-" expression -> negation
+        | "-" NUMBER -> negation
         | "#" expression -> hashtag
         | "(" expression_list ")" -> function_args
         | expression ":" NAME
         | expression "[" expression "]"
         | expression "." NAME
 ?expression_list: (NAME ",")* NAME
-literal: NUMBER | STRING
+literal: NUMBER | STRING | NAME
 
 NUMBER: INTEGER | DECIMAL_NUMBER | HEXADECIMAL_NUMBER | BINARY_NUMBER | OCTAL_NUMBER | FLOAT_NUMBER
 STRING : /[ubf]?r?("(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?')/i

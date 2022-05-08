@@ -4,6 +4,28 @@ si arlène == andy
 alors
   arlène = 1
   répète
-     arlène = arlène + 2
+     arlène = 2
   jusqu à arlène > 10
 fin
+
+tant que andy == 2
+fait
+  andy = 4
+fin
+
+pour i = 10,1
+fait 
+  andy = i
+fin
+
+fonction max(num1, num2)
+   si num1 > num2 alors
+      result = num1
+   sinon
+      result = num2
+   fin
+   retourne 1
+   print(result)
+fin
+
+test = {andy, arlène}

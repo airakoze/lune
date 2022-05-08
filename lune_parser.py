@@ -13,7 +13,13 @@ class Lune_Parser:
             left_hand, right_hand = tree.children
             return self.transform_to_unicode(left_hand.children[0]) + " = " + self.transform_to_unicode(right_hand.children[0])
         elif tree.data == "var":
-            return self.transform_to_unicode(tree.children[0])
+            if len(tree.children) == 1:
+                return self.transform_to_unicode(tree.children[0])
+            else:
+                mult_var = ""
+                for token in tree.children[1:]:
+                    mult_var += ", " + self.transform_to_unicode(token)
+                return self.transform_to_unicode(tree.children[0]) + mult_var
         elif tree.data == "literal":
             return self.transform_to_unicode(tree.children[0])
         elif tree.data == "greater_than":
@@ -89,10 +95,10 @@ class Lune_Parser:
             return "if " + self.translate(expression) + "\nthen\n" + self.translate(block) + self.translate(elseif) + self.translate(optional_else) + "\nend\n"
         elif tree.data == "while_statement":
             expression, block = tree.children
-            return "while\n" + self.translate(expression) + "\ndo\n" + self.translate(block) + "\nend\n"
+            return "while " + self.translate(expression) + "\ndo\n" + self.translate(block) + "\nend\n"
         elif tree.data == "repeat_statement":
             block, expression = tree.children
-            return "repeat\n" + block + "until\n" + expression 
+            return "repeat\n" + self.translate(block) + "\nuntil\n" + self.translate(expression)
         elif tree.data == "do_statement":
             block = tree.children
             return "do\n" + self.translate(block) + "\nend\n"
@@ -100,26 +106,31 @@ class Lune_Parser:
             return "\nbreak\n"
         elif tree.data == "range": 
             exp1, exp2, exp3 = tree.children
-            temp_exp3 = ", " + self.translate(exp2) if self.translate(exp3) else ""
-            return self.translate(exp1) + ", " + self.translate(exp2) +  temp_exp3
-        elif tree.data == "for_statement1":
-            pass
-        elif tree.data == "for_statement2":
-            pass
+            opt_exp3 = "," + exp3 if exp3 else ""
+            return exp1 + "," + exp2 + opt_exp3
+        elif tree.data == "for_statement":
+            var, for_range, block = tree.children
+            return "for " + var + " = " + self.translate(for_range) + "\ndo\n" + self.translate(block) + "\nend\n"
+        elif tree.data == "function":
+            function_name, args, block = tree.children
+            return "function " + function_name + " (" + self.translate(args) + ")\n" + self.translate(block) + "\nend\n"
+        elif tree.data == "return": 
+            exp = tree.children[0]
+            return "return " + self.translate(exp)
         elif tree.data == "local_function":
-            pass
-        elif tree.data == "local_variable":
-            pass
-        elif tree.data == "not_expression":
-            pass
-        elif tree.data == "nil_value":
-            pass
-        elif tree.data == "false_value":
-            pass
-        elif tree.data == "true_value":
-            pass
-        elif tree.data == "function_definition":
-            pass
+            function_name, args, block = tree.children
+            return "local function " + function_name + " (" + self.translate(args) + ")\n" + self.translate(block) + "\nend\n"
+        elif tree.data == "function_call":
+            function_name, var = tree.children
+            return function_name + "(" + self.translate(var) + ")"
+        elif tree.data == "table":
+            var, table_constructor = tree.children
+            return self.translate(var) + "=" + self.translate(table_constructor)
+        elif tree.data == "table_constructor":
+            exp = tree.children[0]
+            print(exp)
+            opt_exp = self.translate(exp) if self.translate(exp) else ""
+            return "{" + opt_exp + "}"
         else:
             return ""
             # print(tree.data)
